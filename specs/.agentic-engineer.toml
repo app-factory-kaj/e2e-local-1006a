@@ -1,0 +1,4 @@
+apiVersion = "agentic-engineer/v1"
+name = "e2e-local-1006a"
+createdAt = "2026-10-06T08:51:12Z"
+idea = "A small Go HTTP service called greeter. GET /hello?name=X returns a JSON greeting. Follow the conventions in `app-factory-kaj/e2e-reference`."
