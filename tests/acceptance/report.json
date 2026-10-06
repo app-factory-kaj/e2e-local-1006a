@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-06T00:00:00Z",
+  "commit": "eedc18ec285c40ee57473b034493439b2ee68cc3",
+  "baseUrl": "http://development-default.openchoreoapis.localhost:19080/e2e-local-1006a-greeter-http",
+  "isolation": "the greeter service is stateless with no persisted data; each scenario asserts only on the response to its own request, so no shared state can leak between scenarios",
+  "scenarios": [
+    {
+      "feature": "Greeter",
+      "featureFile": "specs/validation/acceptance/greeter.feature",
+      "line": 6,
+      "rule": "Calling GET /hello with a name returns a greeting personalized to that name",
+      "scenario": "A named caller gets a personalized greeting",
+      "tags": ["@story-1"],
+      "outcome": "passed",
+      "steps": [
+        { "text": "the greeter service is running", "keyword": "Given",
+          "command": "curl -s -o /dev/null -w '%{http_code}' \"$BASE/hello\"",
+          "exit": 0, "observed": "200" },
+        { "text": "an API Consumer calls GET /hello with name \"Ada\"", "keyword": "When",
+          "command": "curl -s -w '\\nSTATUS:%{http_code}\\n' \"$BASE/hello?name=Ada\"",
+          "exit": 0, "observed": "200 {\"message\":\"Hello, Ada!\"}" },
+        { "text": "the response is a JSON greeting with message \"Hello, Ada!\"", "keyword": "Then",
+          "command": "curl -s \"$BASE/hello?name=Ada\" | python3 -c \"import sys,json; d=json.load(sys.stdin); exit(0 if d.get('message')=='Hello, Ada!' else 1)\"",
+          "exit": 0, "observed": "{\"message\":\"Hello, Ada!\"}" }
+      ],
+      "evidence": {
+        "network": [{ "method": "GET", "url": "/hello?name=Ada", "status": 200 }]
+      }
+    },
+    {
+      "feature": "Greeter",
+      "featureFile": "specs/validation/acceptance/greeter.feature",
+      "line": 14,
+      "rule": "Calling GET /hello without a name still succeeds with a default greeting",
+      "scenario": "Omitting the name parameter still returns a greeting",
+      "tags": ["@story-2"],
+      "outcome": "passed",
+      "steps": [
+        { "text": "the greeter service is running", "keyword": "Given",
+          "command": "curl -s -o /dev/null -w '%{http_code}' \"$BASE/hello\"",
+          "exit": 0, "observed": "200" },
+        { "text": "an API Consumer calls GET /hello without a name parameter", "keyword": "When",
+          "command": "curl -s -w '\\nSTATUS:%{http_code}\\n' \"$BASE/hello\"",
+          "exit": 0, "observed": "200 {\"message\":\"Hello, World!\"}" },
+        { "text": "the response is a JSON greeting with message \"Hello, World!\"", "keyword": "Then",
+          "command": "curl -s \"$BASE/hello\" | python3 -c \"import sys,json; d=json.load(sys.stdin); exit(0 if d.get('message')=='Hello, World!' else 1)\"",
+          "exit": 0, "observed": "{\"message\":\"Hello, World!\"}" }
+      ],
+      "evidence": {
+        "network": [{ "method": "GET", "url": "/hello", "status": 200 }]
+      }
+    },
+    {
+      "feature": "Greeter",
+      "featureFile": "specs/validation/acceptance/greeter.feature",
+      "line": 19,
+      "rule": "Calling GET /hello without a name still succeeds with a default greeting",
+      "scenario": "An empty name parameter still returns a greeting",
+      "tags": ["@story-2"],
+      "outcome": "passed",
+      "steps": [
+        { "text": "the greeter service is running", "keyword": "Given",
+          "command": "curl -s -o /dev/null -w '%{http_code}' \"$BASE/hello\"",
+          "exit": 0, "observed": "200" },
+        { "text": "an API Consumer calls GET /hello with name \"\"", "keyword": "When",
+          "command": "curl -s -w '\\nSTATUS:%{http_code}\\n' \"$BASE/hello?name=\"",
+          "exit": 0, "observed": "200 {\"message\":\"Hello, World!\"}" },
+        { "text": "the response is a JSON greeting with message \"Hello, World!\"", "keyword": "Then",
+          "command": "curl -s \"$BASE/hello?name=\" | python3 -c \"import sys,json; d=json.load(sys.stdin); exit(0 if d.get('message')=='Hello, World!' else 1)\"",
+          "exit": 0, "observed": "{\"message\":\"Hello, World!\"}" }
+      ],
+      "evidence": {
+        "network": [{ "method": "GET", "url": "/hello?name=", "status": 200 }]
+      }
+    },
+    {
+      "feature": "Greeter",
+      "featureFile": "specs/validation/acceptance/greeter.feature",
+      "line": 27,
+      "rule": "A name longer than 100 characters is rejected",
+      "scenario": "An overly long name is refused",
+      "tags": ["@story-1", "@negative"],
+      "outcome": "passed",
+      "steps": [
+        { "text": "the greeter service is running", "keyword": "Given",
+          "command": "curl -s -o /dev/null -w '%{http_code}' \"$BASE/hello\"",
+          "exit": 0, "observed": "200" },
+        { "text": "an API Consumer calls GET /hello with a name that is 101 characters long", "keyword": "When",
+          "command": "LONGNAME=$(python3 -c \"print('a'*101)\"); curl -s -w '\\nSTATUS:%{http_code}\\n' \"$BASE/hello?name=$LONGNAME\"",
+          "exit": 0, "observed": "400 {\"error\":\"name must be at most 100 characters, got 101\"}" },
+        { "text": "the response is a 400 error and no greeting is returned", "keyword": "Then",
+          "command": "curl -s -o /tmp/resp.json -w '%{http_code}' \"$BASE/hello?name=$LONGNAME\" | grep -q '^400$'; python3 -c \"import json; d=json.load(open('/tmp/resp.json')); exit(0 if 'error' in d and 'message' not in d else 1)\"",
+          "exit": 0, "observed": "status 400, body {\"error\":\"name must be at most 100 characters, got 101\"}, no \"message\" key present" }
+      ],
+      "evidence": {
+        "network": [{ "method": "GET", "url": "/hello?name=<101 chars>", "status": 400 }]
+      }
+    }
+  ]
+}
