@@ -8,7 +8,7 @@
   "entrypoint": "deployment/service",
   "exposure": "internet",
   "dependencies": [],
-  "description": "A small, stateless Go HTTP service exposing GET /hello, which returns a JSON greeting personalized to a `name` query parameter, or a default greeting when it is omitted. It follows the conventions in app-factory-kaj/e2e-reference. It does not persist any data, require sign-in, or expose any other endpoint.",
+  "description": "A small, stateless Go HTTP service exposing GET /hello, which returns a JSON greeting personalized to a `name` query parameter, or a default greeting when it is omitted. It follows the conventions in app-factory-kaj/e2e-reference: entrypoint at cmd/greeter/main.go with business logic behind small interfaces in internal/greeter, errors wrapped with context and never discarded, all responses (success and error) as stable-shape JSON with Content-Type: application/json, errors shaped as {\"error\": \"message\"} with the right status code, tests as *_test.go run via go test ./..., the standard library net/http, and configuration read from environment variables with sensible defaults (PORT=8080). It does not persist any data, require sign-in, or expose any other endpoint.",
   "stories": [1, 2],
   "skillsPinned": ["openapi-conventions", "go"]
 }

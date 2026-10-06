@@ -16,7 +16,8 @@ paths:
           required: false
           schema:
             type: string
-          description: The name to greet; defaults to "World" when omitted or empty.
+            maxLength: 100
+          description: The name to greet; defaults to "World" when omitted or empty. Rejected when longer than 100 characters.
       responses:
         '200':
           description: Greeting returned
@@ -24,6 +25,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Greeting'
+        '400':
+          description: The name parameter exceeds the maximum allowed length
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     Greeting:
@@ -33,3 +40,10 @@ components:
         message:
           type: string
           description: The greeting sentence, e.g. "Hello, World!"
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Human-readable error message, per the reference conventions' {"error":"message"} shape.

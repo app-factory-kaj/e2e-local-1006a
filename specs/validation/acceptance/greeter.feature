@@ -20,3 +20,11 @@ Feature: Greeter
       Given the greeter service is running
       When an API Consumer calls GET /hello with name ""
       Then the response is a JSON greeting with message "Hello, World!"
+
+  @story-1 @negative
+  Rule: A name longer than 100 characters is rejected
+
+    Scenario: An overly long name is refused
+      Given the greeter service is running
+      When an API Consumer calls GET /hello with a name that is 101 characters long
+      Then the response is a 400 error and no greeting is returned
