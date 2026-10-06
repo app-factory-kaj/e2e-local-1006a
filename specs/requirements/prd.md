@@ -35,3 +35,5 @@ Greeter is a small Go HTTP service exposing a single endpoint, `GET /hello`, tha
 ## Open Questions
 
 None at this time.
+
+E2E marker e2e-local-1006a.
